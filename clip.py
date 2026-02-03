@@ -12,11 +12,11 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 # Professional Caption Style
 FONT = "C:/Windows/Fonts/arial.ttf"  # More readable font
 FONT_FALLBACK = "Arial"  # Fallback if file path doesn't work
-FONT_SIZE = 45  # Smaller, less intrusive size
+FONT_SIZE = 42  # Slightly smaller size to ensure full words fit
 COLOR = 'white'
 STROKE_COLOR = 'black'
 STROKE_WIDTH = 2  # Moderate outline for readability
-CAPTION_MARGIN = 0.1  # 10% margin from edges
+CAPTION_MARGIN = 0.12  # 12% margin from edges for better padding
 
 def time_to_seconds(time_str):
     time_str = time_str.lower().replace('s', '').strip()
@@ -27,6 +27,44 @@ def time_to_seconds(time_str):
         elif len(parts) == 3:
             return int(parts[0]) * 3600 + int(parts[1]) * 60 + float(parts[2])
     return float(time_str)
+
+def split_text_to_single_lines(text, max_width, font, font_size):
+    """Split text into multiple single lines that fit within max_width."""
+    words = text.split()
+    lines = []
+    current_line = ""
+    
+    for word in words:
+        test_line = current_line + (" " if current_line else "") + word
+        
+        # Create a temporary TextClip to measure width
+        try:
+            temp_clip = TextClip(
+                text=test_line,
+                font=font,
+                font_size=font_size,
+                method='label'  # Use label for single line
+            )
+            text_width = temp_clip.size[0]
+            temp_clip.close()  # Clean up
+        except:
+            # Fallback estimation: assume each character is about font_size/2 pixels
+            text_width = len(test_line) * (font_size // 2)
+        
+        if text_width <= max_width:
+            current_line = test_line
+        else:
+            if current_line:
+                lines.append(current_line)
+                current_line = word
+            else:
+                # Single word is too long, add it anyway
+                lines.append(word)
+    
+    if current_line:
+        lines.append(current_line)
+    
+    return lines
 
 def get_caption_clips(transcript_filename, start_offset, end_offset, video_w, video_h):
     """Generates professionally styled TextClips that appear only when spoken."""
@@ -58,44 +96,68 @@ def get_caption_clips(transcript_filename, start_offset, end_offset, video_w, vi
                     if len(clean_text) > 100:  # Split very long sentences
                         clean_text = clean_text[:97] + "..."
                     
-                    try:
-                        # Create professional caption with proper sizing
-                        # Try main font first, fallback if it doesn't work
+                    # Split text into single lines to prevent wrapping
+                    text_lines = split_text_to_single_lines(clean_text, safe_width, FONT, FONT_SIZE)
+                    
+                    # Create separate caption clips for each line
+                    for line_idx, line_text in enumerate(text_lines):
+                        if not line_text.strip():
+                            continue
+                            
                         try:
-                            txt = TextClip(
-                                text=clean_text,
-                                font=FONT,
-                                font_size=FONT_SIZE,
-                                color=COLOR,
-                                stroke_color=STROKE_COLOR,
-                                stroke_width=STROKE_WIDTH,
-                                method='caption',
-                                size=(safe_width, None)  # Auto-wrap within safe area
-                            )
-                        except:
-                            # Fallback to system font if file path fails
-                            txt = TextClip(
-                                text=clean_text,
-                                font=FONT_FALLBACK,
-                                font_size=FONT_SIZE,
-                                color=COLOR,
-                                stroke_color=STROKE_COLOR,
-                                stroke_width=STROKE_WIDTH,
-                                method='caption',
-                                size=(safe_width, None)  # Auto-wrap within safe area
-                            )
-                        
-                        txt = txt.with_start(local_start).with_duration(local_end - local_start)
-                        
-                        # Position in bottom third, but with safe margins
-                        y_position = int(video_h * 0.75)  # Bottom third
-                        txt = txt.with_position(('center', y_position))
-                        
-                        caption_clips.append(txt)
-                        
-                    except Exception as e:
-                        print(f"⚠️ Caption error for text '{clean_text[:30]}...': {e}")
-                        continue
+                            # Create single-line caption
+                            # Try main font first, fallback if it doesn't work
+                            try:
+                                txt = TextClip(
+                                    text=line_text,
+                                    font=FONT,
+                                    font_size=FONT_SIZE,
+                                    color=COLOR,
+                                    stroke_color=STROKE_COLOR,
+                                    stroke_width=STROKE_WIDTH,
+                                    method='label',  # Use label for guaranteed single line
+                                    margin=(10, 10)  # Add padding around text to prevent cutoff
+                                )
+                            except:
+                                # Fallback to system font if file path fails
+                                txt = TextClip(
+                                    text=line_text,
+                                    font=FONT_FALLBACK,
+                                    font_size=FONT_SIZE,
+                                    color=COLOR,
+                                    stroke_color=STROKE_COLOR,
+                                    stroke_width=STROKE_WIDTH,
+                                    method='label',  # Use label for guaranteed single line
+                                    margin=(10, 10)  # Add padding around text to prevent cutoff
+                                )
+                            
+                            # Calculate timing for this specific line
+                            line_duration = (local_end - local_start) / len(text_lines)
+                            line_start = local_start + (line_idx * line_duration)
+                            line_end = line_start + line_duration
+                            
+                            txt = txt.with_start(line_start).with_duration(line_duration)
+                            
+                            # Position text higher up and ensure it's never cut off
+                            # Get the actual text height to position it properly
+                            text_height = txt.size[1] if txt.size[1] else FONT_SIZE + 20
+                            
+                            # Position at around 65% down the screen with generous bottom margin
+                            # Leave 20% margin at bottom to ensure text is never cut off
+                            bottom_margin = int(video_h * 0.20)
+                            y_position = video_h - text_height - bottom_margin
+                            
+                            # Keep text around 60-65% down the screen
+                            max_y_position = int(video_h * 0.65)
+                            y_position = min(max_y_position, y_position)
+                            
+                            txt = txt.with_position(('center', y_position))
+                            
+                            caption_clips.append(txt)
+                            
+                        except Exception as e:
+                            print(f"⚠️ Caption error for text '{line_text[:30]}...': {e}")
+                            continue
                     
     return caption_clips
 
