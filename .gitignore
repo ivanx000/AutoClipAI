@@ -11,14 +11,25 @@ huggingface/
 
 # Sensitive Data
 .env
+backend/.env
+frontend/.env.local
+frontend/.env
 api_keys.txt
 
 # Media Files (Don't upload large videos to GitHub)
 *.mp4
 *.mp3
 *.wav
-input_videos/
-output_clips/
+temp_audio.mp3
+*TEMP_MPY*
+
+# Data folders (user-generated content)
+data/videos/
+data/clips/
+data/uploads/
+data/output/
+data/transcripts/
+data/analysis/
 
 # OS Specific
 .DS_Store

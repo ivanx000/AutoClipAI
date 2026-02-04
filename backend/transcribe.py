@@ -1,12 +1,17 @@
 import os
 import time
+from pathlib import Path
 from moviepy import VideoFileClip
 from faster_whisper import WhisperModel
 
+# --- PATH SETUP ---
+BACKEND_DIR = Path(__file__).parent
+PROJECT_ROOT = BACKEND_DIR.parent
+
 # --- CONFIGURATION ---
-INPUT_DIR = "input_videos"
-OUTPUT_DIR = "transcripts"
-AUDIO_TEMP = "temp_audio.mp3"
+INPUT_DIR = PROJECT_ROOT / "data" / "videos"       # Put your long videos here
+OUTPUT_DIR = PROJECT_ROOT / "data" / "transcripts"
+AUDIO_TEMP = BACKEND_DIR / "temp_audio.mp3"
 
 # Ensure folders exist
 os.makedirs(INPUT_DIR, exist_ok=True)

@@ -1,12 +1,17 @@
 import os
 import re
+from pathlib import Path
 from moviepy import VideoFileClip, TextClip, CompositeVideoClip
 
+# --- PATH SETUP ---
+BACKEND_DIR = Path(__file__).parent
+PROJECT_ROOT = BACKEND_DIR.parent
+
 # --- CONFIGURATION ---
-VIDEO_DIR = "input_videos"
-ANALYSIS_DIR = "analysis_results"
-TRANSCRIPT_DIR = "transcripts"
-OUTPUT_DIR = "output_clips"
+VIDEO_DIR = PROJECT_ROOT / "data" / "videos"        # Long videos folder
+ANALYSIS_DIR = PROJECT_ROOT / "data" / "analysis"
+TRANSCRIPT_DIR = PROJECT_ROOT / "data" / "transcripts"
+OUTPUT_DIR = PROJECT_ROOT / "data" / "output"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # Professional Caption Style

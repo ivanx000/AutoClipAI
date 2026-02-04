@@ -1,9 +1,14 @@
 import os
+from pathlib import Path
 from google import genai
 from dotenv import load_dotenv
 
+# --- PATH SETUP ---
+BACKEND_DIR = Path(__file__).parent
+PROJECT_ROOT = BACKEND_DIR.parent
+
 # 1. Setup
-load_dotenv()
+load_dotenv(BACKEND_DIR / ".env")
 api_key = os.getenv("GEMINI_API_KEY")
 
 if not api_key:
@@ -14,8 +19,8 @@ if not api_key:
 client = genai.Client(api_key=api_key)
 
 # --- CONFIGURATION ---
-TRANSCRIPT_DIR = "transcripts"
-ANALYSIS_DIR = "analysis_results"
+TRANSCRIPT_DIR = PROJECT_ROOT / "data" / "transcripts"
+ANALYSIS_DIR = PROJECT_ROOT / "data" / "analysis"
 os.makedirs(ANALYSIS_DIR, exist_ok=True)
 
 def analyze_transcript(file_path, filename):
