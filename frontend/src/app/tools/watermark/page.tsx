@@ -3,18 +3,18 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import VideoUpload from './VideoUpload';
-import ProcessingStatus from './ProcessingStatus';
+import WatermarkRemover from '@/components/WatermarkRemover';
+import ProcessingStatus from '@/components/ProcessingStatus';
 
 interface Job {
   jobId: string;
   filename: string;
 }
 
-export default function Dashboard() {
+export default function WatermarkRemovalPage() {
   const [currentJob, setCurrentJob] = useState<Job | null>(null);
 
-  const handleUploadComplete = (jobId: string, filename: string) => {
+  const handleJobStarted = (jobId: string, filename: string) => {
     setCurrentJob({ jobId, filename });
   };
 
@@ -36,16 +36,13 @@ export default function Dashboard() {
             </span>
           </Link>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6">
             <Link
               href="/"
               className="text-sm text-slate-600 hover:text-slate-900 transition-colors"
             >
               Home
             </Link>
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
-              <span className="text-white text-xs font-medium">U</span>
-            </div>
           </div>
         </div>
       </nav>
@@ -71,15 +68,18 @@ export default function Dashboard() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12"
         >
+          <div className="inline-block px-4 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium mb-4">
+            🧹 AI Tool
+          </div>
           <h1 
             className="text-4xl md:text-5xl font-bold text-slate-900 mb-4"
             style={{ fontFamily: 'var(--font-display)' }}
           >
-            Add Captions to Your Video
+            Remove Watermarks with AI
           </h1>
           <p className="text-xl text-slate-500 max-w-2xl mx-auto">
-            Upload your video and our AI will automatically transcribe and add 
-            professional captions in seconds.
+            Use AI-powered video inpainting to seamlessly remove watermarks, logos, 
+            and unwanted elements from your videos.
           </p>
         </motion.div>
 
@@ -91,10 +91,10 @@ export default function Dashboard() {
           className="flex flex-wrap justify-center gap-3 mb-12"
         >
           {[
-            { icon: '🎯', text: 'Auto-sync captions' },
-            { icon: '🤖', text: 'AI transcription' },
-            { icon: '⚡', text: 'Fast processing' },
-            { icon: '✨', text: 'Professional style' },
+            { icon: '🎯', text: 'Precise selection' },
+            { icon: '🤖', text: 'AI inpainting' },
+            { icon: '🎬', text: 'Preserves quality' },
+            { icon: '⚡', text: 'Batch processing' },
           ].map((feature, i) => (
             <span
               key={i}
@@ -105,14 +105,14 @@ export default function Dashboard() {
           ))}
         </motion.div>
 
-        {/* Upload or Processing */}
+        {/* Tool or Processing */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
           {!currentJob ? (
-            <VideoUpload onUploadComplete={handleUploadComplete} />
+            <WatermarkRemover onJobStarted={handleJobStarted} />
           ) : (
             <ProcessingStatus
               jobId={currentJob.jobId}
@@ -137,28 +137,28 @@ export default function Dashboard() {
             {[
               {
                 step: '1',
-                title: 'Upload Video',
-                description: 'Drag and drop your video file or click to browse. Supports MP4, MOV, and MKV.',
+                title: 'Upload & Select',
+                description: 'Upload your video and draw a box around the watermark you want to remove.',
                 icon: (
                   <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                 ),
               },
               {
                 step: '2',
                 title: 'AI Processing',
-                description: 'Our AI transcribes your audio and generates perfectly timed captions.',
+                description: 'Our AI analyzes the video and intelligently fills in the watermark region.',
                 icon: (
                   <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                   </svg>
                 ),
               },
               {
                 step: '3',
-                title: 'Download',
-                description: 'Get your captioned video ready for social media in just minutes.',
+                title: 'Download Clean Video',
+                description: 'Get your watermark-free video with the original quality preserved.',
                 icon: (
                   <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -169,17 +169,14 @@ export default function Dashboard() {
               <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="relative bg-white rounded-2xl border border-slate-200 p-8 text-center"
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 + i * 0.1 }}
+                className="text-center"
               >
-                <div className="w-12 h-12 mx-auto mb-4 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-xl flex items-center justify-center text-blue-500">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 text-white flex items-center justify-center">
                   {item.icon}
                 </div>
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                  {item.step}
-                </div>
+                <div className="text-sm text-purple-500 font-medium mb-2">Step {item.step}</div>
                 <h3 className="text-lg font-semibold text-slate-900 mb-2">{item.title}</h3>
                 <p className="text-slate-500 text-sm">{item.description}</p>
               </motion.div>
@@ -187,16 +184,6 @@ export default function Dashboard() {
           </div>
         </motion.div>
       </main>
-
-      {/* Footer */}
-      <footer className="border-t border-slate-100 mt-24 py-8 px-6">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-slate-400">© 2026 AIClips. All rights reserved.</p>
-          <Link href="/" className="text-sm text-slate-400 hover:text-slate-600 transition-colors">
-            Back to Home
-          </Link>
-        </div>
-      </footer>
     </div>
   );
 }

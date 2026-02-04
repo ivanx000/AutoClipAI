@@ -96,7 +96,7 @@ export default function CTA() {
                   </li>
                 ))}
               </ul>
-              <Link href="/dashboard" className="mt-auto">
+              <Link href="/tools" className="mt-auto">
                 <motion.button
                   className="w-full py-3 bg-slate-100 text-slate-700 font-medium rounded-full hover:bg-slate-200 transition-all"
                   whileHover={{ scale: 1.02 }}
@@ -130,7 +130,7 @@ export default function CTA() {
                   </li>
                 ))}
               </ul>
-              <Link href="/dashboard" className="mt-auto">
+              <Link href="/tools" className="mt-auto">
                 <motion.button
                   className="w-full py-3 bg-white text-blue-600 font-medium rounded-full hover:bg-blue-50 transition-all"
                   whileHover={{ scale: 1.02 }}
@@ -161,7 +161,7 @@ export default function CTA() {
                   </li>
                 ))}
               </ul>
-              <Link href="/dashboard" className="mt-auto">
+              <Link href="/tools" className="mt-auto">
                 <motion.button
                   className="w-full py-3 bg-slate-900 text-white font-medium rounded-full hover:bg-slate-800 transition-all"
                   whileHover={{ scale: 1.02 }}

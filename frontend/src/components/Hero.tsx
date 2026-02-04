@@ -155,7 +155,7 @@ export default function Hero() {
             variants={itemVariants}
             className="flex flex-col sm:flex-row gap-4 justify-center items-center"
           >
-            <Link href="/dashboard">
+            <Link href="/tools">
               <motion.button
                 className="px-8 py-4 bg-slate-900 text-white font-semibold text-lg rounded-full hover:bg-slate-800 transition-all duration-300 float-shadow"
                 whileHover={{ scale: 1.02, y: -2 }}

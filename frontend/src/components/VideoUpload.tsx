@@ -40,9 +40,10 @@ export default function VideoUpload({ onUploadComplete }: VideoUploadProps) {
       setState(s => ({ ...s, error: 'Please upload MP4, MOV, or MKV files only.' }));
       return false;
     }
-    // 500MB limit
-    if (file.size > 500 * 1024 * 1024) {
-      setState(s => ({ ...s, error: 'File size must be under 500MB.' }));
+    // 10GB limit for long-form videos (up to 1 hour)
+    const maxSize = 10 * 1024 * 1024 * 1024; // 10GB
+    if (file.size > maxSize) {
+      setState(s => ({ ...s, error: 'File size must be under 10GB.' }));
       return false;
     }
     return true;
