@@ -1,86 +1,89 @@
-# AutoClip AI 🎬
+# AIClips 🎬✨
 
-A local AI-powered tool for creating captioned video clips with a modern web interface.
+Your complete AI toolkit for video creation. Viral clips, captions, voiceovers, and more — all in one place.
 
-## Features
+![Next.js](https://img.shields.io/badge/Next.js-16.1-black?logo=next.js)
+![Python](https://img.shields.io/badge/Python-3.12-blue?logo=python)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.128-teal?logo=fastapi)
+![Supabase](https://img.shields.io/badge/Supabase-Auth-green?logo=supabase)
 
-### 1. **Web Interface** (Recommended)
-Upload videos through a beautiful web app and get captioned videos back.
+## 🚀 Live Demo
 
-### 2. **CLI Tools** (Advanced)
-Run scripts directly for batch processing or automation.
+- **Frontend:** Hosted on [Vercel](https://vercel.com)
+- **Backend:** Hosted on [Railway](https://railway.app)
+- **Auth & DB:** [Supabase](https://supabase.com)
 
 ---
 
-## 🚀 Quick Start
+## ✨ Features
 
-### Option 1: Web App (Frontend + Backend)
+| Tool | Description | Status |
+|------|-------------|--------|
+| 🔥 **Viral Clips** | AI finds engaging moments from long-form videos, creates short clips for TikTok/Reels/Shorts | ✅ Ready |
+| 💬 **AI Captions** | Generate word-level synced captions with multiple styles | ✅ Ready |
+| ✨ **Watermark Remover** | AI-powered watermark detection and removal | ✅ Ready |
+| 🧹 **Caption Remover** | Remove hardcoded captions/subtitles from videos | ✅ Ready |
+| 🎙️ **Text to Speech** | Natural-sounding voiceovers with multiple AI voices | ✅ Ready |
+| 🎬 **AI Video Generation** | Text-to-video creation with Sora | 🔜 Coming Soon |
 
-**Terminal 1 - Start the API Server:**
+---
+
+## 🏗️ Architecture
+
+```
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│     Vercel      │     │     Railway     │     │    Supabase     │
+│   (Frontend)    │────▶│    (Backend)    │────▶│  (Auth + DB)    │
+│   Next.js 16    │     │  FastAPI/Python │     │   PostgreSQL    │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+```
+
+---
+
+## 🛠️ Local Development
+
+### Prerequisites
+- Python 3.12+
+- Node.js 18+
+- FFmpeg (for video processing)
+
+### Backend Setup
 ```bash
 cd backend
-pip install -r requirements.txt
-python api.py
-# Server runs at http://localhost:8000
-```
 
-**Terminal 2 - Start the Frontend:**
-```bash
-cd frontend
-npm install
-npm run dev
-# App runs at http://localhost:3000
-```
-
-Then open http://localhost:3000, click "Get Started", and upload your video!
-
-### Option 2: CLI - Add Captions to a Clip
-```bash
-# 1. Place your clip in data/clips/
-# 2. Run:
-python backend/add_captions.py
-
-# 3. Get captioned video from data/output/
-```
-
-### Option 3: CLI - Full Viral Clip Pipeline
-```bash
-# 1. Place long recording in data/videos/
-# 2. Run the full pipeline:
-python backend/run_pipeline.py
-
-# 3. Get viral clips from data/output/
-```
-
----
-
-## 🛠️ Setup
-
-### Requirements
-- Python 3.12+
-- Node.js 18+ (for frontend)
-- Windows (uses Windows fonts)
-
-### Backend Installation
-```bash
 # Create virtual environment
 python -m venv venv
-venv\Scripts\activate
+venv\Scripts\activate  # Windows
+# source venv/bin/activate  # Mac/Linux
 
 # Install dependencies
-pip install -r backend/requirements.txt
+pip install -r requirements.txt
+
+# Create .env file
+echo "GEMINI_API_KEY=your_key_here" > .env
+
+# Start server
+python api.py
+# API runs at http://localhost:8000
 ```
 
-### Frontend Installation
+### Frontend Setup
 ```bash
 cd frontend
-npm install
-```
 
-### API Key (Only for Full Pipeline)
-Create a `.env` file in the `backend/` folder with your Gemini API key:
-```
-GEMINI_API_KEY=your_key_here
+# Install dependencies
+npm install
+
+# Create .env.local file
+cat > .env.local << EOF
+NEXT_PUBLIC_PEXELS_API_KEY=your_pexels_key
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+EOF
+
+# Start dev server
+npm run dev
+# App runs at http://localhost:3000
 ```
 
 ---
@@ -88,31 +91,44 @@ GEMINI_API_KEY=your_key_here
 ## 📁 Project Structure
 
 ```
-AutoClipAI/
-├── backend/                # Python backend
-│   ├── api.py              # FastAPI server (web interface)
-│   ├── add_captions.py     # Quick caption generator
-│   ├── run_pipeline.py     # Full viral clip pipeline
-│   ├── transcribe.py       # Audio transcription (Whisper)
-│   ├── analyze.py          # AI highlight detection (Gemini)
-│   ├── clip.py             # Video clipping & captions
-│   ├── requirements.txt    # Python dependencies
-│   └── .env                # API keys (create this)
+AIClips/
+├── backend/                    # Python FastAPI backend
+│   ├── api.py                  # Main API server
+│   ├── pipeline.py             # Video processing pipeline
+│   ├── services/
+│   │   └── video_cleaner.py    # Watermark/caption removal
+│   ├── requirements.txt
+│   ├── nixpacks.toml           # Railway deployment config
+│   └── .env                    # API keys (create this)
 │
-├── frontend/               # Next.js web interface
+├── frontend/                   # Next.js web interface
 │   ├── src/
-│   │   ├── app/            # Pages
-│   │   └── components/     # React components
-│   └── package.json
+│   │   ├── app/
+│   │   │   ├── page.tsx        # Landing page
+│   │   │   ├── login/          # Auth pages
+│   │   │   ├── signup/
+│   │   │   └── tools/          # Tool pages
+│   │   │       ├── captions/
+│   │   │       ├── watermark/
+│   │   │       ├── caption-remover/
+│   │   │       ├── viral-clips/
+│   │   │       ├── text-to-speech/
+│   │   │       └── video-generation/
+│   │   ├── components/
+│   │   │   ├── ToolPageLayout.tsx
+│   │   │   ├── ToolsDashboard.tsx
+│   │   │   └── ...
+│   │   └── lib/
+│   │       └── supabase/       # Supabase client
+│   ├── middleware.ts           # Auth middleware
+│   └── .env.local              # Environment vars (create this)
 │
-├── data/                   # All data files
-│   ├── videos/             # Long videos for pipeline
-│   ├── clips/              # Short clips for captions
-│   ├── uploads/            # Web uploads (auto-managed)
-│   ├── transcripts/        # Generated transcripts
-│   ├── analysis/           # AI analysis results
-│   └── output/             # Final processed videos
+├── data/                       # Processing data (gitignored)
+│   ├── uploads/
+│   ├── output/
+│   └── transcripts/
 │
+├── railway.toml                # Railway deployment config
 └── README.md
 ```
 
@@ -120,42 +136,65 @@ AutoClipAI/
 
 ## 🌐 API Endpoints
 
+### Core Endpoints
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/` | Health check |
-| POST | `/api/upload` | Upload a video file |
+| GET | `/health` | Health check |
+| POST | `/api/upload` | Upload a video file (up to 10GB) |
 | POST | `/api/process/{job_id}` | Start processing |
 | GET | `/api/status/{job_id}` | Get job status |
 | GET | `/api/download/{job_id}` | Download result |
-| GET | `/api/jobs` | List all jobs |
+
+### Tool Endpoints
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/v1/tools/remove-watermark` | Remove watermark from video |
+| POST | `/api/v1/tools/remove-captions` | Remove hardcoded captions |
+| POST | `/api/v1/tools/text-to-speech` | Generate speech from text |
 
 ---
 
-## 🎨 Caption Style
+## 🚀 Deployment
 
-- **Font:** Arial, 42px
-- **Style:** White text with black outline
-- **Position:** Lower third of video
-- **Format:** Single-line captions (auto-splits long text)
+### Frontend (Vercel)
+1. Connect your GitHub repo to Vercel
+2. Set root directory to `frontend`
+3. Add environment variables:
+   - `NEXT_PUBLIC_PEXELS_API_KEY`
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+4. Deploy
 
-To customize, edit the configuration in `backend/api.py` or `backend/add_captions.py`.
+### Backend (Railway)
+1. Connect your GitHub repo to Railway
+2. Set root directory to `backend`
+3. Add environment variables:
+   - `GEMINI_API_KEY`
+   - `FRONTEND_URL` (your Vercel URL)
+4. Deploy
+
+### Auth & Database (Supabase)
+1. Create a new Supabase project
+2. Enable Email Auth in Authentication settings
+3. Copy your project URL and anon key to the frontend env vars
 
 ---
 
-## ⚙️ Technical Details
+## ⚙️ Tech Stack
 
-- **Backend:** FastAPI + Python
-- **Frontend:** Next.js 16 + React 19 + Tailwind CSS
-- **Transcription:** `faster-whisper` with `large-v3-turbo` model (local CPU)
-- **Video Processing:** `MoviePy` + `FFmpeg`
-- **AI Analysis:** Google Gemini 2.5 Flash (for full pipeline only)
+| Layer | Technology |
+|-------|------------|
+| Frontend | Next.js 16, React 19, Tailwind CSS, Framer Motion |
+| Backend | FastAPI, Python 3.12, Uvicorn |
+| Video Processing | MoviePy, FFmpeg, OpenCV |
+| Transcription | faster-whisper (large-v3-turbo) |
+| AI Analysis | Google Gemini 2.5 Flash |
+| Text-to-Speech | Microsoft Edge TTS |
+| Auth | Supabase Auth |
+| Hosting | Vercel (frontend), Railway (backend) |
 
 ---
 
-## License
+## 📄 License
 
 MIT License - See [LICENSE](LICENSE) for details.
-
-## License
-
-MIT License - See [LICENSE](LICENSE)
