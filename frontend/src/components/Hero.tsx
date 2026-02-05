@@ -144,9 +144,9 @@ export default function Hero() {
             variants={itemVariants}
             className="text-xl md:text-2xl text-black max-w-2xl mx-auto mb-12 leading-relaxed font-light"
           >
-            Transform hours of raw footage into viral-ready clips.
+            Your complete AI toolkit for video creation.
             <span className="block mt-2 text-black/80">
-              Automatic hooks. Perfect framing. Instant captions.
+              Viral clips. Captions. Voiceovers. All in one place.
             </span>
           </motion.p>
 

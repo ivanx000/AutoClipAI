@@ -401,6 +401,60 @@ async def remove_captions(
     }
 
 
+# --- TEXT TO SPEECH ---
+
+class TTSRequest(BaseModel):
+    text: str
+    voice: str = "en-US-AriaNeural"
+
+
+@app.post("/api/v1/tools/text-to-speech")
+async def text_to_speech(request: TTSRequest):
+    """
+    Convert text to speech using Edge TTS.
+    
+    Args:
+        text: Text to convert (max 5000 chars)
+        voice: Voice ID (default: en-US-AriaNeural)
+    
+    Returns:
+        audio_url: URL to download the generated MP3
+    """
+    import edge_tts
+    import asyncio
+    
+    if not request.text.strip():
+        raise HTTPException(400, "Text cannot be empty")
+    
+    if len(request.text) > 5000:
+        raise HTTPException(400, "Text exceeds 5000 character limit")
+    
+    # Valid voices
+    valid_voices = [
+        "en-US-AriaNeural", "en-US-GuyNeural", "en-US-JennyNeural",
+        "en-GB-SoniaNeural", "en-GB-RyanNeural", "en-AU-NatashaNeural"
+    ]
+    
+    voice = request.voice if request.voice in valid_voices else "en-US-AriaNeural"
+    
+    # Generate unique filename
+    audio_filename = f"tts_{str(uuid.uuid4())[:8]}.mp3"
+    audio_path = OUTPUT_DIR / audio_filename
+    
+    try:
+        # Generate speech
+        communicate = edge_tts.Communicate(request.text, voice)
+        await communicate.save(str(audio_path))
+        
+        return {
+            "status": "success",
+            "audio_url": f"/files/output/{audio_filename}",
+            "voice": voice
+        }
+    except Exception as e:
+        raise HTTPException(500, f"TTS generation failed: {str(e)}")
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)

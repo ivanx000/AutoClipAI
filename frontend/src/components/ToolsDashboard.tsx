@@ -78,6 +78,19 @@ const tools: Tool[] = [
     href: '/tools/video-generation',
     badge: 'Coming Soon',
   },
+  {
+    id: 'text-to-speech',
+    title: 'AI Text to Speech',
+    description: 'Convert any text into natural-sounding speech. Listen instantly or download as MP3.',
+    icon: (
+      <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+      </svg>
+    ),
+    gradient: 'from-emerald-500 to-teal-500',
+    href: '/tools/text-to-speech',
+    badge: 'New',
+  },
 ];
 
 export default function ToolsDashboard() {

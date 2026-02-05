@@ -3,18 +3,41 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { createClient } from '@/lib/supabase/client';
+import type { User } from '@supabase/supabase-js';
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const supabase = createClient();
 
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
     };
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+
+    // Check auth state
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      subscription.unsubscribe();
+    };
+  }, [supabase.auth]);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    window.location.href = '/';
+  };
 
   return (
     <motion.nav
@@ -76,12 +99,49 @@ export default function Navigation() {
 
         {/* CTA Button */}
         <div className="hidden md:flex items-center gap-3">
-          <motion.button
-            className="px-4 py-2 text-sm font-medium text-black hover:text-black/70 transition-colors duration-300"
-            whileHover={{ scale: 1.02 }}
-          >
-            Sign In
-          </motion.button>
+          {user ? (
+            <>
+              <Link href="/tools">
+                <motion.button
+                  className="px-4 py-2 text-sm font-medium text-black hover:text-black/70 transition-colors duration-300"
+                  whileHover={{ scale: 1.02 }}
+                >
+                  Dashboard
+                </motion.button>
+              </Link>
+              <motion.button
+                onClick={handleSignOut}
+                className="px-4 py-2 text-sm font-medium text-slate-500 hover:text-black transition-colors duration-300"
+                whileHover={{ scale: 1.02 }}
+              >
+                Sign Out
+              </motion.button>
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
+                <span className="text-white text-xs font-medium">
+                  {user.email?.charAt(0).toUpperCase()}
+                </span>
+              </div>
+            </>
+          ) : (
+            <>
+              <Link href="/login">
+                <motion.button
+                  className="px-4 py-2 text-sm font-medium text-black hover:text-black/70 transition-colors duration-300"
+                  whileHover={{ scale: 1.02 }}
+                >
+                  Sign In
+                </motion.button>
+              </Link>
+              <Link href="/signup">
+                <motion.button
+                  className="px-5 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full hover:shadow-lg transition-all duration-300"
+                  whileHover={{ scale: 1.02 }}
+                >
+                  Get Started
+                </motion.button>
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
@@ -145,9 +205,31 @@ export default function Navigation() {
                 </motion.a>
               ))}
               <div className="pt-4 border-t border-slate-100 space-y-3">
-                <button className="w-full py-3 text-black font-medium">
-                  Sign In
-                </button>
+                {user ? (
+                  <>
+                    <Link href="/tools" className="block w-full py-3 text-black font-medium text-center">
+                      Dashboard
+                    </Link>
+                    <button 
+                      onClick={handleSignOut}
+                      className="w-full py-3 text-slate-500 font-medium"
+                    >
+                      Sign Out
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/login" className="block w-full py-3 text-black font-medium text-center">
+                      Sign In
+                    </Link>
+                    <Link 
+                      href="/signup" 
+                      className="block w-full py-3 text-center text-white bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl font-medium"
+                    >
+                      Get Started
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </motion.div>
