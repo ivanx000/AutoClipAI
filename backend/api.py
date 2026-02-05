@@ -3,6 +3,7 @@ AutoClipAI FastAPI Server
 REST API endpoints for video processing.
 """
 
+import os
 import uuid
 import shutil
 from pathlib import Path
@@ -35,10 +36,19 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# CORS for frontend
+# CORS for frontend (local dev + Vercel production)
+ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    os.getenv("FRONTEND_URL", "https://auto-clip-ai.vercel.app"),
+]
+# Add any custom frontend URL from environment
+if os.getenv("FRONTEND_URL"):
+    ALLOWED_ORIGINS.append(os.getenv("FRONTEND_URL"))
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -46,6 +56,14 @@ app.add_middleware(
 
 # Serve output videos statically
 app.mount("/files", StaticFiles(directory=str(DATA_DIR)), name="files")
+
+
+# --- HEALTH CHECK ---
+@app.get("/health")
+async def health_check():
+    """Health check endpoint for Railway"""
+    return {"status": "healthy", "version": "1.0.0"}
+
 
 # --- IN-MEMORY JOB STORAGE ---
 jobs: dict = {}
@@ -457,4 +475,5 @@ async def text_to_speech(request: TTSRequest):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    port = int(os.getenv("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
